@@ -5,10 +5,12 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HomeComponent } from './pages/home/home.component';
 import { NotFoundComponent } from './pages/not-found/not-found.component';
+import { HeaderComponent } from '../components/header/header.component';
+import { MedalsCountryComponent } from "../components/country-medals/country-medals";
 
 @NgModule({
   declarations: [AppComponent, HomeComponent, NotFoundComponent],
-  imports: [BrowserModule, AppRoutingModule, HttpClientModule],
+  imports: [BrowserModule, AppRoutingModule, HttpClientModule, HeaderComponent, MedalsCountryComponent],
   providers: [],
   bootstrap: [AppComponent],
 })
