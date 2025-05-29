@@ -12,79 +12,88 @@ import annotationPlugin from 'chartjs-plugin-annotation';
 // Plugin personnalisé pour labels externes
 const externalLabelsPlugin = {
   id: 'externalLabels',
-  afterDatasetDraw(chart: any, args: any, options: any) {
+  afterDatasetDraw(chart: any) {
     const { ctx, chartArea, data } = chart;
     if (!chartArea) return;
 
     const meta = chart.getDatasetMeta(0);
-    const centerX = (chartArea.left + chartArea.right) / 2;
-    const centerY = (chartArea.top + chartArea.bottom) / 2;
-    const outerRadius = meta.data[0]?.outerRadius ?? 0;
-    const isMobile = window.innerWidth < 568;
+    const isMobile = window.innerWidth < 468; 
 
-    // Paramètres ajustables
-    const minLabelDistance = isMobile ? 18 : 50; // Distance minimale absolue
-    const labelPadding = isMobile ? -8 : 20; // Espace supplémentaire
-    const lineExtension = isMobile ? 10 : 25; // Longueur de l'extension horizontale
+    if (isMobile) {
+      meta.data.forEach((arc: any, index: number) => {
+        const angle = (arc.startAngle + arc.endAngle) / 2; // angle central du segment
+        const label = data.labels?.[index];
+        const value = data.datasets[0].data[index];
 
-    meta.data.forEach((arc: any, index: number) => {
-      const angle = (arc.startAngle + arc.endAngle) / 2;
-      const label = data.labels?.[index];
+        // Rayon pour placer le texte bien au milieu du segment
+        const radius = (arc.innerRadius + arc.outerRadius) / 2;
 
-      // 1. Calcul des positions avec distance dynamique
-      const dynamicDistance = Math.max(outerRadius * 0.3, minLabelDistance);
-      const x1 = centerX + outerRadius * Math.cos(angle);
-      const y1 = centerY + outerRadius * Math.sin(angle);
-      const x2 = centerX + (outerRadius + dynamicDistance) * Math.cos(angle);
-      const y2 =
-        centerY + (outerRadius + dynamicDistance * 0.4) * Math.sin(angle);
-      const x3 = x2 + Math.cos(angle) * lineExtension; // Extension finale
+        // Calcul de la position x/y
+        const x = arc.x + Math.cos(angle) * radius;
+        const y = arc.y + Math.sin(angle) * radius;
 
-      // 2. Dessin de la ligne de connexion (3 segments)
-      ctx.beginPath();
-      ctx.moveTo(x1, y1);
-      ctx.lineTo(x2, y2);
-      ctx.lineTo(x3, y2);
-      ctx.strokeStyle = '#666';
-      ctx.lineWidth = isMobile ? 1 : 1.5;
-      ctx.stroke();
+        // Style du texte
+        ctx.font = `bold ${this.getFontSize(value)}px Arial`;
+        ctx.fillStyle = '#000';
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 2;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
 
-      // 3. Configuration du texte
-      const textConfig = {
-        x: x3 + (angle > Math.PI ? -labelPadding : labelPadding),
-        y: y2,
-        align: angle > Math.PI ? 'right' : ('left' as CanvasTextAlign),
-        font: isMobile ? 'bold 10px Arial' : 'bold 12px Arial',
-      };
+        // Dessin du label avec contour blanc
+        ctx.strokeText(label, x, y);
+        ctx.fillText(label, x, y);
+      });
+    }
 
-      ctx.font = textConfig.font;
-      ctx.fillStyle = '#333';
-      ctx.textAlign = textConfig.align;
-      ctx.textBaseline = 'middle';
+    else {
+      // Version desktop - Labels avec traits de connexion
+      const centerX = (chartArea.left + chartArea.right) / 2;
+      const centerY = (chartArea.top + chartArea.bottom) / 2;
+      const outerRadius = meta.data[0]?.outerRadius ?? 0;
 
-      // 4. Gestion des labels longs (mobile)
-      if (isMobile && label.length > 10) {
-        const shortened = this.shortenLabel(label);
-        ctx.fillText(shortened, textConfig.x, textConfig.y);
-      } else {
-        ctx.fillText(label, textConfig.x, textConfig.y);
-      }
-    });
+      meta.data.forEach((arc: any, index: number) => {
+        const angle = (arc.startAngle + arc.endAngle) / 2;
+        const label = data.labels?.[index];
+
+        // Points de la ligne de connexion
+        const x1 = centerX + outerRadius * Math.cos(angle);
+        const y1 = centerY + outerRadius * Math.sin(angle);
+        const x2 = centerX + (outerRadius + 40) * Math.cos(angle);
+        const y2 = centerY + (outerRadius + 20) * Math.sin(angle);
+        const x3 = x2 + (Math.cos(angle) * 25);
+
+        // Dessin de la ligne
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.lineTo(x3, y2);
+        ctx.strokeStyle = '#666';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        // Texte
+        ctx.font = 'bold 12px Arial';
+        ctx.fillStyle = '#333';
+        ctx.textAlign = angle > Math.PI ? 'right' : 'left';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(label, x3 + (angle > Math.PI ? -5 : 5), y2);
+      });
+    }
+
   },
 
-  shortenLabel(label: string): string {
-    // Abrège les longs noms de pays
-    const abbreviations: Record<string, string> = {
-      'United States': 'USA',
-    };
-
-    return (
-      abbreviations[label] ||
-      (label.length > 10 ? label.substring(0, 8) + '..' : label)
-    );
+  // Fonction pour déterminer la taille de police en fonction de la valeur
+  getFontSize(value: number): number {
+    const baseSize = 8;
+    const scaleFactor = Math.min(value / 1000, 1);
+    return baseSize + Math.floor(scaleFactor * 4);
   },
+
+
+
+
 };
-
 
 // Enregistrement des plugins
 Chart.register(

@@ -16,8 +16,9 @@
   .containtGraph {
     width: 100%;
     height: auto;
+    display: block;
     // display: flex;
-    // justify-content: center;
-    // align-items: center;
+     justify-content: center;
+     align-items: center;
   }
 }
