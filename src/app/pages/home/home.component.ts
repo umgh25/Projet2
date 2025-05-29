@@ -1,25 +1,27 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { Component, OnInit } from '@angular/core';
+import { Observable, of } from 'rxjs';
+import { OlympicCountry } from 'src/app/core/models/Olympic';
+import { OlympicService } from 'src/app/core/services/olympic.service';
 
-import { HomeComponent } from './home.component';
+@Component({
+  selector: 'app-home',
+  templateUrl: './home.component.html',
+  styleUrls: ['./home.component.scss'],
+})
+export class HomeComponent implements OnInit {
+  public olympics$: Observable<OlympicCountry[] | null> = this.olympicService.getOlympics();
 
-describe('HomeComponent', () => {
-  let component: HomeComponent;
-  let fixture: ComponentFixture<HomeComponent>;
+  constructor(private olympicService: OlympicService) { }
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      declarations: [ HomeComponent ]
-    })
-    .compileComponents();
+  ngOnInit(): void {
+    this.olympics$.subscribe({
+      next: (data) => {
+       // console.log('Data received from olympics$: ', data);
+      },
+      error: (err) => {
+        console.error('Error receiving data: ', err);
+      }
+    });
 
-    fixture = TestBed.createComponent(HomeComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
-});
-
-export { HomeComponent };
+  }
+}

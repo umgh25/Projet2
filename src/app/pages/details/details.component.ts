@@ -1,0 +1,50 @@
+import { Component, OnInit } from '@angular/core';
+import { NameCountryComponent } from "../../components/name-country/name-country.component";
+import { LineGraphComponent } from "../../components/line-graph/line-graph.component";
+import { OlympicCountry } from 'src/app/core/models/Olympic';
+import { ActivatedRoute } from '@angular/router';
+import { OlympicService } from 'src/app/core/services/olympic.service';
+import { CommonModule } from '@angular/common';
+
+@Component({
+  selector: 'app-details',
+  standalone: true,
+  imports: [NameCountryComponent, LineGraphComponent,CommonModule],
+  template: `
+    <div class="container" *ngIf="countryData">
+      <div class="containtInfoCountr">
+        <app-name-country [countryData]="countryData"></app-name-country>
+      </div>
+      <div class="containtGraph">
+        <app-line-graph [countryData]="countryData"></app-line-graph>
+      </div>
+    </div>
+    <div *ngIf="!countryData">
+      <p>Chargement des données...</p>
+    </div>
+  `,
+  styleUrl: './details.component.scss',
+})
+export class DetailsComponent implements OnInit {
+  countryData?: OlympicCountry;
+
+  constructor(
+    private route: ActivatedRoute,
+    private olympicService: OlympicService
+  ) {}
+
+  ngOnInit(): void {
+    this.route.paramMap.subscribe((params) => {
+      const countryName = params.get('country');
+      if (countryName) {
+        this.olympicService.getOlympics().subscribe((data) => {
+          const countries = data as OlympicCountry[];       
+          this.countryData =countries.find(
+            (c) => c.country.toLowerCase() === countryName.toLowerCase()     
+          );
+          // console.log('Pays trouvé :', this.countryData);
+        });
+      }
+    });
+  }
+}

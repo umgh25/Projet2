@@ -1,10 +1,7 @@
-// This file defines the Olympic interface, which represents the Olympic Games details for a specific country.
-import { Participation } from './Participation';
+import { Participation } from "./Participation";
 
-
-export interface Olylmpic {
+export interface OlympicCountry {
     id: number;
     country: string;
     participations: Participation[];
 }
-

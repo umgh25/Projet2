@@ -1,24 +1,8 @@
-<!-- 
-<div *ngIf="olympics$ | async as olympics; else loading">
-    <div *ngIf="olympics; else noData">
-      <h1>Olympic Countries</h1>
-      <ul>
-        <li *ngFor="let country of olympics">
-          {{ country. country }} 
-        </li>
-      </ul>
-    </div>
-    <ng-template #noData>
-      <p>No data available.</p>
-    </ng-template>
-  </div>
-  
-  <ng-template #loading>
-    <p>Loading...</p>
-  </ng-template> -->
 <div class="container">
   <div class="containtInfoCountr">
-    <app-medals-country></app-medals-country>
+<app-medals-country></app-medals-country>
   </div>
-  <div class="containtGraph">GHraph</div>
+  <div class="containtGraph">
+    <app-graphique></app-graphique>
+  </div>
 </div>
