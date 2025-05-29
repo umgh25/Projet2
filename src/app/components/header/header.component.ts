@@ -5,7 +5,7 @@ import { Component } from '@angular/core';
     imports: [],
     template: `
   <div class="containtTittle">
-   <h2 class="title">Olympic games app</h2>
+   <h2 class="title">Olympic Games App</h2>
    </div>
   `,
     styles: `

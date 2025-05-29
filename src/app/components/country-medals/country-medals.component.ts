@@ -21,7 +21,7 @@ import { OlympicService } from 'src/app/core/services/olympic.service';
       </div>
     </section>
   `,
-    styleUrls: ['./medals-country.component.scss']
+    styleUrls: ['./country-medals.component.scss']
 })
 export class MedalsCountryComponent {
   public olympics$: Observable<OlympicCountry[] | null> =

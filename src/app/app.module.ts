@@ -6,9 +6,9 @@ import { AppComponent } from './app.component';
 import { HomeComponent } from './pages/home/home.component';
 import { NotFoundComponent } from './pages/not-found/not-found.component';
 import { HeaderComponent } from './components/header/header.component';
-import { MedalsCountryComponent } from './components/medals-country/medals-country.component';
-import { GraphiqueComponent } from './components/graphique/graphique.component';
-import { NameCountryComponent } from './components/name-country/name-country.component';
+import { MedalsCountryComponent } from './components/country-medals/country-medals.component';
+import { GraphiqueComponent } from './components/country-medals-graph/country-medals-graph.component';
+import { NameCountryComponent } from './components/country-name/country-name.component';
 
 @NgModule({
   declarations: [AppComponent, HomeComponent, NotFoundComponent],

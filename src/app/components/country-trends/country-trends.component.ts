@@ -38,7 +38,7 @@ Chart.register(
   </canvas>
 </div>
   `,
-    styleUrl: './line-graph.component.scss'
+    styleUrl: './country-trends.component.scss'
 })
 export class LineGraphComponent implements OnChanges {
   @Input() countryData?: OlympicCountry;

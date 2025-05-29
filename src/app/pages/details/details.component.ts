@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { NameCountryComponent } from "../../components/name-country/name-country.component";
-import { LineGraphComponent } from "../../components/line-graph/line-graph.component";
+import { NameCountryComponent } from "../../components/country-name/country-name.component";
+import { LineGraphComponent } from "../../components/country-trends/country-trends.component";
 import { OlympicCountry } from 'src/app/core/models/Olympic';
 import { ActivatedRoute } from '@angular/router';
 import { OlympicService } from 'src/app/core/services/olympic.service';
@@ -46,7 +46,7 @@ export class DetailsComponent implements OnInit {
           this.countryData = countries.find(
             (c) => c.country.toLowerCase() === countryName.toLowerCase()
           );
-          // console.log('Pays trouvé :', this.countryData);
+          
         });
       }
     });

@@ -123,7 +123,7 @@ Chart.register(
       </canvas>
     </div>
   `,
-  styleUrl: './graphique.component.scss',
+  styleUrl: './country-medals-graph.component.scss',
 })
 export class GraphiqueComponent {
   chartData: {

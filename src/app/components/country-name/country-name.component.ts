@@ -23,7 +23,7 @@ import { OlympicCountry } from 'src/app/core/models/Olympic';
       </div>
     </section>
   `,
-  styleUrl: './name-country.component.scss',
+  styleUrl: './country-name.component.scss',
 })
 export class NameCountryComponent {
   @Input() countryData!: OlympicCountry;
