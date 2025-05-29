@@ -1,17 +1,11 @@
 .pie-chart-container {
   position: relative;
   margin: 0 auto;
-
-
-  svg {
-    border: 1px solid red;
-  }
 }
 
 .pie-segment {
   transition: opacity 0.3s ease;
   cursor: pointer;
-
 
   &.highlighted {
     opacity: 0.5;

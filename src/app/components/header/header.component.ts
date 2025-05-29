@@ -5,9 +5,14 @@ import { Component } from '@angular/core';
   standalone: true,
   imports: [],
   template: `
+  <div class="containtTittle">
    <h2 class="title">Olympic games app</h2>
+   </div>
   `,
   styles: `
+  .containtTittle{
+    width: 100%;
+
   .title{
     background: rgb(109, 109, 255);
     width: 100%;
@@ -15,6 +20,7 @@ import { Component } from '@angular/core';
     display: flex;
     align-items: center;
     justify-content: center;
+}
 }
   `
 })

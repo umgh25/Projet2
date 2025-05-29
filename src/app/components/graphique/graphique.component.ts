@@ -9,7 +9,7 @@ import { Router } from '@angular/router';
   imports: [CommonModule],
   template: `
     <div class="pie-chart-container">
-      <svg width="800" height="280" viewBox="50 50 300 300">
+      <svg width="350" height="280" viewBox="50 50 300 300">
         <g transform="translate(200, 200)">
           <!-- Fond du cercle -->
           <circle cx="0" cy="0" r="120" fill="#f5f5f5"></circle>

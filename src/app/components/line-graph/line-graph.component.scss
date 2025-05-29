@@ -1,8 +1,8 @@
-.containeGraph{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 550px;
-    height: 250px;
+.containeGraph {
+  display: flex;
+  height: 250px;
 
+  canvas {
+    width: 100%;
+  }
 }
