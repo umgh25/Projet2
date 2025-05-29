@@ -3,86 +3,85 @@ import { Component } from '@angular/core';
 import { OlympicService } from 'src/app/core/services/olympic.service';
 import { Router } from '@angular/router';
 
+
 @Component({
   selector: 'app-graphique',
   standalone: true,
   imports: [CommonModule],
   template: `
     <div class="pie-chart-container">
-      <svg width="350" height="280" viewBox="50 50 300 300">
-        <g transform="translate(200, 200)">
-          <!-- Fond du cercle -->
-          <circle cx="0" cy="0" r="120" fill="#f5f5f5"></circle>
+  <svg viewBox="0 0 400 400" preserveAspectRatio="xMidYMid meet" class="responsive-svg">
+    <g transform="translate(200, 200)">
+      <!-- Cercle de fond -->
+      <circle cx="0" cy="0" r="120" fill="#f5f5f5"></circle>
 
-          <!-- Segments du pie chart -->
-          <path
-            *ngFor="let country of chartData; let i = index"
-            [attr.d]="getSegmentPath(i)"
-            [attr.fill]="country.color"
-            class="pie-segment"
-            (mousemove)="onMouseMove($event, i)"
-            (mouseleave)="hoveredIndex = -1"
-            (click)="onSegmentClick(country.country)" 
-            [class.highlighted]="hoveredIndex === i"
-          ></path>
+      <!-- Segments -->
+      <path
+        *ngFor="let country of chartData; let i = index"
+        [attr.d]="getSegmentPath(i)"
+        [attr.fill]="country.color"
+        class="pie-segment"
+        (mousemove)="onMouseMove($event, i)"
+        (mouseleave)="hoveredIndex = -1"
+        (click)="onSegmentClick(country.country)"
+        [class.highlighted]="hoveredIndex === i"
+      ></path>
 
-          <!-- Infobulle au survol -->
-          <g
-            *ngIf="hoveredIndex >= 0"
-            class="tooltip"
-            [attr.transform]="'translate(' + tooltipX + ',' + tooltipY + ')'"
-          >
-            <rect
-              x="-50"
-              y="-30"
-              rx="5"
-              ry="5"
-              width="100"
-              height="50"
-              fill="#00858B"
-              stroke="#ccc"
-            ></rect>
-            <text
-              x="0"
-              y="-10"
-              text-anchor="middle"
-              fill="white"
-              font-size="14"
-            >
-              {{ chartData[hoveredIndex].country }}
-            </text>
-            <text x="0" y="10" text-anchor="middle" fill="white" font-size="14">
-              🏅{{ chartData[hoveredIndex].totalMedals }}
-            </text>
-          </g>
-          <g *ngFor="let country of chartData; let i = index">
-            <!-- Lien depuis la part vers le texte -->
-            <line
-              [attr.x1]="getLabelLine(i).x1"
-              [attr.y1]="getLabelLine(i).y1"
-              [attr.x2]="getLabelLine(i).x2"
-              [attr.y2]="getLabelLine(i).y2"
-              [attr.stroke]="country.color"
-              stroke-width="1.5"
-            ></line>
+      <!-- Tooltip -->
+      <g
+        *ngIf="hoveredIndex >= 0"
+        class="tooltip"
+        [attr.transform]="'translate(' + tooltipX + ',' + tooltipY + ')'">
+        <rect
+          x="-60"
+          y="-35"
+          rx="8"
+          ry="8"
+          width="120"
+          height="60"
+          fill="#00858B"
+          stroke="#ccc"
+        ></rect>
+        <text
+          x="0"
+          y="-10"
+          text-anchor="middle"
+          fill="white"
+          font-size="14">
+          {{ chartData[hoveredIndex].country }}
+        </text>
+        <text
+          x="0"
+          y="10"
+          text-anchor="middle"
+          fill="white"
+          font-size="14">
+          🏅 {{ chartData[hoveredIndex].totalMedals }}
+        </text>
+      </g>
 
-            <!-- Nom du pays -->
-            <text
-              [attr.x]="
-                getLabelLine(i).x2 +
-                (getLabelLine(i).textAnchor === 'start' ? 5 : -5)
-              "
-              [attr.y]="getLabelLine(i).y2 + 5"
-              [attr.text-anchor]="getLabelLine(i).textAnchor"
-              font-size="12"
-              fill="black"
-            >
-              {{ country.country }}
-            </text>
-          </g>
-        </g>
-      </svg>
-    </div>
+      <!-- Lignes + labels -->
+      <g *ngFor="let country of chartData; let i = index">
+        <line
+          [attr.x1]="getLabelLine(i).x1"
+          [attr.y1]="getLabelLine(i).y1"
+          [attr.x2]="getLabelLine(i).x2"
+          [attr.y2]="getLabelLine(i).y2"
+          [attr.stroke]="country.color"
+          stroke-width="1.5"
+        ></line>
+        <text
+          [attr.x]="getLabelLine(i).x2 + (getLabelLine(i).textAnchor === 'start' ? 5 : -5)"
+          [attr.y]="getLabelLine(i).y2 + 5"
+          [attr.text-anchor]="getLabelLine(i).textAnchor"
+          font-size="12"
+          fill="#333">
+          {{ country.country }}
+        </text>
+      </g>
+    </g>
+  </svg>
+</div>
   `,
   styleUrl: './graphique.component.scss',
 })

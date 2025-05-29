@@ -1,14 +1,40 @@
 .pie-chart-container {
-  position: relative;
-  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 1rem;
+}
+
+.responsive-svg {
+  width: 100%;
+  height: auto;
+  max-width: 400px;
+  transition: transform 0.4s ease;
 }
 
 .pie-segment {
-  transition: opacity 0.3s ease;
   cursor: pointer;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+
+  &:hover {
+    transform: scale(1.03);
+  }
 
   &.highlighted {
-    opacity: 0.5;
-    stroke-width: 2px;
+    opacity: 0.6;
+    stroke: #444;
+    stroke-width: 2;
+  }
+}
+
+.tooltip text {
+  font-weight: bold;
+}
+
+@media screen and (max-width: 768px) {
+  .responsive-svg {
+    max-width: 250px;
+    transform: scale(0.95);
   }
 }
