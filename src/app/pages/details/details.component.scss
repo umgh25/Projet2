@@ -1,5 +1,5 @@
-.btn{
-  background-color:  rgb(0, 128, 145);
+.btn {
+  background-color: rgb(0, 128, 145);
   border: none;
   margin-left: 25px;
   color: white;
@@ -11,26 +11,20 @@
   margin-top: 25px;
 }
 .container {
-    height: 70vh;
+  height: 70vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+
+  .containtInfoCountr {
+    width: 100%;
     display: flex;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 1rem;
-  
-    .containtInfoCountr {
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-    .containtGraph {
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 300px;
-
-    }
   }
-  
+  .containtGraph {
+    width: 60%;
+  }
+}

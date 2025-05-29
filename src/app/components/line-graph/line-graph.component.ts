@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnChanges } from '@angular/core';
-import { ChartConfiguration } from 'chart.js';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { ChartConfiguration, ChartType } from 'chart.js';
 import { OlympicCountry } from 'src/app/core/models/Olympic';
 import { BaseChartDirective } from 'ng2-charts';
+
 import {
   Chart,
   CategoryScale,
@@ -30,66 +31,83 @@ Chart.register(
   standalone: true,
   imports: [CommonModule, BaseChartDirective],
   template: `
-    <div *ngIf="lineChartData" class="containeGraph">
-      <canvas
-        baseChart
-        [data]="lineChartData"
-        [options]="lineChartOptions"
-        [type]="'line'"
-      >
-      </canvas>
-    </div>
+   <div class="chart-container" *ngIf="lineChartData?.datasets?.length">
+  <canvas baseChart
+    [data]="lineChartData"
+    [options]="lineChartOptions"
+    [type]="lineChartType">
+  </canvas>
+</div>
   `,
   styleUrl: './line-graph.component.scss',
 })
 export class LineGraphComponent implements OnChanges {
-  @Input() countryData!: OlympicCountry;
+  @Input() countryData?: OlympicCountry;
 
-  lineChartData: ChartConfiguration<'line'>['data'] | null = null;
+  lineChartData: ChartConfiguration<'line'>['data'] = {
+    labels: [],
+    datasets: [],
+  };
 
   lineChartOptions: ChartConfiguration<'line'>['options'] = {
     responsive: true,
+    maintainAspectRatio: false, 
     plugins: {
       legend: {
         display: true,
-        position: 'bottom',
-      },
+        position: 'top',
+      }
     },
     scales: {
-      x: { title: { display: true, text: 'Année' } },
-      y: { title: { display: true, text: 'Valeur' } },
-    },
+      x: {
+        ticks: {
+          autoSkip: true,
+          maxRotation: 45,
+          minRotation: 0,
+        }
+      },
+      y: {
+        beginAtZero: true,
+      }
+    }
   };
 
-  ngOnChanges(): void {
+  lineChartType: 'line' = 'line';
+
+  
+
+  ngOnChanges(changes: SimpleChanges): void {
     if (this.countryData) {
-      const participations = this.countryData.participations;
+      const labels = this.countryData.participations.map(p => p.year.toString());
+
+      const medals = this.countryData.participations.map(p => p.medalsCount);
+      const athletes = this.countryData.participations.map(p => p.athleteCount);
+      const ratio = this.countryData.participations.map(p => 
+        p.athleteCount ? +(p.medalsCount / p.athleteCount).toFixed(2) : 0
+      );
 
       this.lineChartData = {
-        labels: participations.map(p => p.year.toString()),
+        labels,
         datasets: [
           {
-            label: 'Nombre de médailles',
-            data: participations.map(p => p.medalsCount),
+            label: 'Médailles',
+            data: medals,
+            borderColor: '#742774',
+            fill: false
+          },
+          {
+            label: 'Athlètes',
+            data: athletes,
             borderColor: '#1f77b4',
-            fill: false,
-            tension: 0.3,
+            fill: false
           },
           {
-            label: 'Nombre d’athlètes',
-            data: participations.map(p => p.athleteCount),
-            borderColor: '#ff7f0e',
-            fill: false,
-            tension: 0.3,
-          },
-          {
-            label: 'Participations',
-            data: participations.map(() => 1),
+            label: 'Ratio Médailles / Athlètes',
+            data: ratio,
             borderColor: '#2ca02c',
-            fill: false,
-            tension: 0.3,
-          },
-        ],
+            fill: false
+          }
+        ]
       };
     }
   }

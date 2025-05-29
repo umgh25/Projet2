@@ -16,7 +16,7 @@ export class HomeComponent implements OnInit {
   ngOnInit(): void {
     this.olympics$.subscribe({
       next: (data) => {
-       // console.log('Data received from olympics$: ', data);
+      
       },
       error: (err) => {
         console.error('Error receiving data: ', err);

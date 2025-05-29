@@ -1,25 +1,13 @@
-.containeGraph {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 1rem;
+.chart-container {
   width: 100%;
-  box-sizing: border-box;
-  
+  height: 200px;
 
-  canvas {
-    width: 100% !important;
-    height: auto !important;
-    max-width: 700px;
+  @media (min-width: 768px) {
+    height: 300px;
+ 
   }
-}
 
-@media screen and (max-width: 768px) {
-  .containeGraph {
-    padding: 0.5rem;
-
-    canvas {
-      max-width: 100%;
-    }
+  @media (min-width: 1200px) {
+    height: 350px;
   }
 }

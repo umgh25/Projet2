@@ -25,39 +25,41 @@ import { OlympicService } from 'src/app/core/services/olympic.service';
   styleUrls: ['./medals-country.component.scss'],
 })
 export class MedalsCountryComponent {
-  public olympics$: Observable<OlympicCountry[] | null> = this.olympicService.getOlympics();
+  public olympics$: Observable<OlympicCountry[] | null> =
+    this.olympicService.getOlympics();
 
   public totalJOs: number = 0;
   public totalCountries: number = 0;
 
-  constructor(private olympicService: OlympicService) { }
+  constructor(private olympicService: OlympicService) {}
 
   ngOnInit(): void {
-    this.olympics$.pipe(
-      map(olympics => {
-        if (!olympics) return { joCount: 0, countryCount: 0 };
+    this.olympics$
+      .pipe(
+        map((olympics) => {
+          if (!olympics) return { joCount: 0, countryCount: 0 };
 
-       
-        // Calcul du nombre de JO uniques
-        const allYears = olympics.flatMap(country =>
-          country.participations.map(participation => participation.year)
-        );
-        const uniqueJOs = new Set(allYears).size;
-        return {
-          joCount: uniqueJOs,
-          countryCount: olympics.length
-        };
-      })
-    ).subscribe({
-      next: ({ joCount, countryCount }) => {
-        this.totalJOs = joCount;
-        this.totalCountries = countryCount;
-      },
-      error: (err) => {
-        console.error('Error calculating stats:', err);
-        this.totalJOs = 0;
-        this.totalCountries = 0;
-      }
-    });
+          // Calcul du nombre de JO uniques
+          const allYears = olympics.flatMap((country) =>
+            country.participations.map((participation) => participation.year)
+          );
+          const uniqueJOs = new Set(allYears).size;
+          return {
+            joCount: uniqueJOs,
+            countryCount: olympics.length,
+          };
+        })
+      )
+      .subscribe({
+        next: ({ joCount, countryCount }) => {
+          this.totalJOs = joCount;
+          this.totalCountries = countryCount;
+        },
+        error: (err) => {
+          console.error('Error calculating stats:', err);
+          this.totalJOs = 0;
+          this.totalCountries = 0;
+        },
+      });
   }
 }
