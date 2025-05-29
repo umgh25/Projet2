@@ -19,6 +19,7 @@ section {
     .numbers {
       display: flex;
       justify-content: center;
+      flex-wrap: wrap;
       gap: 2rem;
       padding-top: 20px;
     }

@@ -1,5 +1,5 @@
 .container {
-  height: 70vh;
+  height: 80vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -11,11 +11,13 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    
   }
   .containtGraph {
     width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    height: auto;
+    // display: flex;
+    // justify-content: center;
+    // align-items: center;
   }
 }

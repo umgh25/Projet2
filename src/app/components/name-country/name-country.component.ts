@@ -3,11 +3,10 @@ import { OlympicCountry } from 'src/app/core/models/Olympic';
 
 @Component({
   selector: 'app-name-country',
-  standalone: true,
   imports: [],
   template: `
-     <section>
-      <div class="tittle">Name of the country</div>
+    <section>
+      <div class="tittle">{{this.countryData.country}}</div>
       <div class="numbers">
         <span>
           <p>Number of entries</p>
@@ -24,17 +23,22 @@ import { OlympicCountry } from 'src/app/core/models/Olympic';
       </div>
     </section>
   `,
-  styleUrl: './name-country.component.scss'
+  styleUrl: './name-country.component.scss',
 })
 export class NameCountryComponent {
   @Input() countryData!: OlympicCountry;
 
   getTotalMedals(): number {
-    return this.countryData.participations.reduce((sum, p) => sum + p.medalsCount, 0);
+    return this.countryData.participations.reduce(
+      (sum, p) => sum + p.medalsCount,
+      0
+    );
   }
 
   getTotalAthletes(): number {
-    return this.countryData.participations.reduce((sum, p) => sum + p.athleteCount, 0);
+    return this.countryData.participations.reduce(
+      (sum, p) => sum + p.athleteCount,
+      0
+    );
   }
-
 }

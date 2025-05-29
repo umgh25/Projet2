@@ -8,10 +8,9 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-details',
-  standalone: true,
-  imports: [NameCountryComponent, LineGraphComponent, CommonModule],
-  template: `
+    selector: 'app-details',
+    imports: [NameCountryComponent, LineGraphComponent, CommonModule],
+    template: `
   <button (click)="back()" class="btn">Back</button>
     <div class="container" *ngIf="countryData">
       <div class="containtInfoCountr">
@@ -25,7 +24,7 @@ import { Router } from '@angular/router';
       <p>Chargement des données...</p>
     </div>
   `,
-  styleUrl: './details.component.scss',
+    styleUrl: './details.component.scss'
 })
 export class DetailsComponent implements OnInit {
   countryData?: OlympicCountry;

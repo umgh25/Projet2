@@ -27,10 +27,9 @@ Chart.register(
 );
 
 @Component({
-  selector: 'app-line-graph',
-  standalone: true,
-  imports: [CommonModule, BaseChartDirective],
-  template: `
+    selector: 'app-line-graph',
+    imports: [CommonModule, BaseChartDirective],
+    template: `
    <div class="chart-container" *ngIf="lineChartData?.datasets?.length">
   <canvas baseChart
     [data]="lineChartData"
@@ -39,7 +38,7 @@ Chart.register(
   </canvas>
 </div>
   `,
-  styleUrl: './line-graph.component.scss',
+    styleUrl: './line-graph.component.scss'
 })
 export class LineGraphComponent implements OnChanges {
   @Input() countryData?: OlympicCountry;

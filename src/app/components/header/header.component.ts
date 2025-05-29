@@ -1,15 +1,14 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'app-header',
-  standalone: true,
-  imports: [],
-  template: `
+    selector: 'app-header',
+    imports: [],
+    template: `
   <div class="containtTittle">
    <h2 class="title">Olympic games app</h2>
    </div>
   `,
-  styles: `
+    styles: `
   .containtTittle{
     width: 100%;
 

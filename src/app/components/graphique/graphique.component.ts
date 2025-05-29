@@ -2,137 +2,121 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { OlympicService } from 'src/app/core/services/olympic.service';
 import { Router } from '@angular/router';
+import { BaseChartDirective } from 'ng2-charts';
+import { ChartConfiguration, ChartType } from 'chart.js';
+import 'chartjs-plugin-annotation';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
+import { Chart, ArcElement, Tooltip, Legend, PieController } from 'chart.js';
+import annotationPlugin from 'chartjs-plugin-annotation';
+
+// Plugin personnalisé pour labels externes
+const externalLabelsPlugin = {
+  id: 'externalLabels',
+  afterDatasetDraw(chart: any, args: any, options: any) {
+    const { ctx, chartArea, data } = chart;
+    if (!chartArea) return;
+
+    const meta = chart.getDatasetMeta(0);
+    const centerX = (chartArea.left + chartArea.right) / 2;
+    const centerY = (chartArea.top + chartArea.bottom) / 2;
+    const outerRadius = meta.data[0]?.outerRadius ?? 0;
+    const isMobile = window.innerWidth < 568;
+
+    // Paramètres ajustables
+    const minLabelDistance = isMobile ? 18 : 50; // Distance minimale absolue
+    const labelPadding = isMobile ? -8 : 20; // Espace supplémentaire
+    const lineExtension = isMobile ? 10 : 25; // Longueur de l'extension horizontale
+
+    meta.data.forEach((arc: any, index: number) => {
+      const angle = (arc.startAngle + arc.endAngle) / 2;
+      const label = data.labels?.[index];
+
+      // 1. Calcul des positions avec distance dynamique
+      const dynamicDistance = Math.max(outerRadius * 0.3, minLabelDistance);
+      const x1 = centerX + outerRadius * Math.cos(angle);
+      const y1 = centerY + outerRadius * Math.sin(angle);
+      const x2 = centerX + (outerRadius + dynamicDistance) * Math.cos(angle);
+      const y2 =
+        centerY + (outerRadius + dynamicDistance * 0.4) * Math.sin(angle);
+      const x3 = x2 + Math.cos(angle) * lineExtension; // Extension finale
+
+      // 2. Dessin de la ligne de connexion (3 segments)
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.lineTo(x3, y2);
+      ctx.strokeStyle = '#666';
+      ctx.lineWidth = isMobile ? 1 : 1.5;
+      ctx.stroke();
+
+      // 3. Configuration du texte
+      const textConfig = {
+        x: x3 + (angle > Math.PI ? -labelPadding : labelPadding),
+        y: y2,
+        align: angle > Math.PI ? 'right' : ('left' as CanvasTextAlign),
+        font: isMobile ? 'bold 10px Arial' : 'bold 12px Arial',
+      };
+
+      ctx.font = textConfig.font;
+      ctx.fillStyle = '#333';
+      ctx.textAlign = textConfig.align;
+      ctx.textBaseline = 'middle';
+
+      // 4. Gestion des labels longs (mobile)
+      if (isMobile && label.length > 10) {
+        const shortened = this.shortenLabel(label);
+        ctx.fillText(shortened, textConfig.x, textConfig.y);
+      } else {
+        ctx.fillText(label, textConfig.x, textConfig.y);
+      }
+    });
+  },
+
+  shortenLabel(label: string): string {
+    // Abrège les longs noms de pays
+    const abbreviations: Record<string, string> = {
+      'United States': 'USA',
+    };
+
+    return (
+      abbreviations[label] ||
+      (label.length > 10 ? label.substring(0, 8) + '..' : label)
+    );
+  },
+};
+
+
+// Enregistrement des plugins
+Chart.register(
+  ArcElement,
+  Tooltip,
+  Legend,
+  PieController,
+  annotationPlugin,
+  externalLabelsPlugin,
+  ChartDataLabels
+);
 
 @Component({
   selector: 'app-graphique',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, BaseChartDirective],
   template: `
     <div class="pie-chart-container">
-      <svg
-        viewBox="0 0 400 400"
-        preserveAspectRatio="xMidYMid meet"
-        class="responsive-svg"
+      <canvas
+        baseChart
+        [data]="pieChartData"
+        [options]="pieChartOptions"
+        [type]="pieChartType"
+        (chartHover)="chartHovered($event)"
+        (chartClick)="chartClicked($event)"
       >
-        <g transform="translate(200, 200)">
-          <!-- Cercle de fond -->
-          <circle cx="0" cy="0" r="120" fill="#f5f5f5"></circle>
-
-          <!-- Segments -->
-          <path
-            *ngFor="let country of chartData; let i = index"
-            [attr.d]="getSegmentPath(i)"
-            [attr.fill]="country.color"
-            class="pie-segment"
-            (mousemove)="onMouseMove($event, i)"
-            (mouseleave)="hoveredIndex = -1"
-            (click)="onSegmentClick(country.country)"
-            [class.highlighted]="hoveredIndex === i"
-          ></path>
-
-          <!-- Tooltip -->
-          <g
-            *ngIf="hoveredIndex >= 0"
-            class="tooltip"
-            [attr.transform]="'translate(' + tooltipX + ',' + tooltipY + ')'"
-          >
-            <rect
-              x="-60"
-              y="-35"
-              rx="8"
-              ry="8"
-              width="120"
-              height="60"
-              fill="#00858B"
-              stroke="#ccc"
-            ></rect>
-            <text
-              x="0"
-              y="-10"
-              text-anchor="middle"
-              fill="white"
-              font-size="14"
-            >
-              {{ chartData[hoveredIndex].country }}
-            </text>
-            <text x="0" y="10" text-anchor="middle" fill="white" font-size="14">
-              🏅 {{ chartData[hoveredIndex].totalMedals }}
-            </text>
-          </g>
-
-          <!-- Lignes + labels -->
-          <g *ngFor="let country of chartData; let i = index">
-            <line
-              [attr.x1]="getLabelLine(i).x1"
-              [attr.y1]="getLabelLine(i).y1"
-              [attr.x2]="getLabelLine(i).x2"
-              [attr.y2]="getLabelLine(i).y2"
-              [attr.stroke]="country.color"
-              stroke-width="1.5"
-            ></line>
-            <text
-              [attr.x]="
-                getLabelLine(i).x2 +
-                (getLabelLine(i).textAnchor === 'start' ? 5 : -5)
-              "
-              [attr.y]="getLabelLine(i).y2 + 5"
-              [attr.text-anchor]="getLabelLine(i).textAnchor"
-              font-size="12"
-              fill="#333"
-            >
-              {{ country.country }}
-            </text>
-          </g>
-        </g>
-      </svg>
+      </canvas>
     </div>
   `,
   styleUrl: './graphique.component.scss',
 })
 export class GraphiqueComponent {
-  // Calcule les coordonnées pour les lignes et labels
-  getLabelLine(index: number) {
-    // Calcul des angles de début et fin pour le segment
-    let startAngle = 0;
-    for (let i = 0; i < index; i++) {
-      startAngle += (this.chartData[i].totalMedals / this.totalMedals) * 360;
-    }
-    const endAngle =
-      startAngle + (this.chartData[index].totalMedals / this.totalMedals) * 360;
-    const midAngle = (startAngle + endAngle) / 2;
-
-    // Points de départ (bord du pie) et d'arrivée (position du texte)
-    const lineStart = this.polarToCartesian(0, 0, 120, midAngle); // bord du pie
-    const lineEnd = this.polarToCartesian(0, 0, 150, midAngle); // éloigné pour texte
-
-    // Détermine l'alignement du texte selon la position
-    const textAnchor = midAngle > 90 && midAngle < 270 ? 'end' : 'start';
-
-    return {
-      x1: lineStart.x,
-      y1: lineStart.y,
-      x2: lineEnd.x,
-      y2: lineEnd.y,
-      textAnchor,
-    };
-  }
-  // Gère le mouvement de la souris pour l'infobulle
-  onMouseMove(event: MouseEvent, index: number): void {
-    this.hoveredIndex = index;
-
-    // Conversion des coordonnées de la souris en coordonnées SVG
-    const svg = (event.target as SVGPathElement).ownerSVGElement;
-    const pt = svg!.createSVGPoint();
-    pt.x = event.clientX;
-    pt.y = event.clientY;
-
-    // Convertit les coordonnées de la fenêtre en coordonnées SVG
-    const cursorpt = pt.matrixTransform(svg!.getScreenCTM()!.inverse());
-    this.tooltipX = cursorpt.x - 230;
-    this.tooltipY = cursorpt.y - 230; // un petit décalage vers le haut
-  }
-
-  // Données du graphique
   chartData: {
     country: string;
     totalMedals: number;
@@ -140,10 +124,61 @@ export class GraphiqueComponent {
     percentage: number;
   }[] = [];
   totalMedals = 0;
-  hoveredIndex = -1;
   colorScheme = ['#8C3F4D', '#9D5D5D', '#AEC4E8', '#C2E3F5', '#9986A5'];
-  tooltipX = 0;
-  tooltipY = 0;
+
+  public pieChartType: ChartType = 'pie';
+
+  // Structure des données pour ng2-charts
+  public pieChartData: ChartConfiguration['data'] = {
+    labels: [], // Noms des pays 
+    datasets: [{ data: [], backgroundColor: [], hoverBackgroundColor: [] }],
+  };
+
+  public pieChartOptions: ChartConfiguration['options'] = {
+    maintainAspectRatio: false,
+    layout: {
+      padding: {
+        top: 30,
+        bottom: 30,
+        left: 30,
+        right: 30,
+      },
+    },
+    plugins: {
+      legend: {
+        display: false,
+      },
+      datalabels: {
+        display: false,
+      },
+      tooltip: {
+        enabled: true,
+        callbacks: {
+          label: (context) => {
+            const value = context.raw as number;
+            const medalIcon = '🏅';
+            return `${medalIcon} ${value}`;
+          },
+        },
+        backgroundColor: '#008C99',
+        titleColor: '#fff',
+        bodyColor: '#fff',
+        borderColor: '#fff',
+        borderWidth: 1,
+        cornerRadius: 8,
+        padding: 10,
+        displayColors: false,
+      },
+
+    },
+
+    onClick: (_event, elements) => {
+      if (elements.length > 0) {
+        const index = elements[0].index;
+        this.onSegmentClick(this.chartData[index].country);
+      }
+    },
+  };
 
   constructor(private olympicService: OlympicService, private router: Router) { }
 
@@ -152,18 +187,16 @@ export class GraphiqueComponent {
       next: (data) => {
         if (data) {
           // Calcul du total des médailles
-
           this.totalMedals = data.reduce(
             (sum, country) =>
               sum +
               country.participations.reduce((s, p) => s + p.medalsCount, 0),
             0
           );
-          
 
-          // Préparation des données pour le graphique
+          // Transformation des données pour le graphique
           this.chartData = data
-            .map((country, index) => ({  
+            .map((country, index) => ({
               country: country.country,
               totalMedals: country.participations.reduce(
                 (sum, p) => sum + p.medalsCount,
@@ -172,81 +205,52 @@ export class GraphiqueComponent {
               color: this.colorScheme[index % this.colorScheme.length],
               percentage: 0,
             }))
-            .sort((a, b) => b.totalMedals - a.totalMedals);
+            .sort((a, b) => b.totalMedals - a.totalMedals); // Tri décroissant
 
-          // Calcul des pourcentages
-          this.chartData = this.chartData.map((item) => {
-            const percentage = (item.totalMedals / this.totalMedals) * 100;
-            item.percentage = percentage;
-            return item;
-          });
+          this.updateChartData();
         }
       },
       error: (err) => console.error('Error loading data:', err),
     });
   }
 
-  // Génère le path SVG pour un segment du camembert
-  getSegmentPath(index: number): string {
-    if (!this.chartData.length) return '';
-
-    // Calcul de l'angle de départ
-    let startAngle = 0;
-    for (let i = 0; i < index; i++) {
-      startAngle += (this.chartData[i].totalMedals / this.totalMedals) * 360;
-    }
-
-    // Calcul de l'angle de fin
-    const endAngle =
-      startAngle + (this.chartData[index].totalMedals / this.totalMedals) * 360;
-
-    // Génération du path SVG
-    return this.describeArc(0, 0, 120, startAngle, endAngle);
-  }
-
-  // Génère la description d'un arc SVG
-  private describeArc(
-    x: number,
-    y: number,
-    radius: number,
-    startAngle: number,
-    endAngle: number
-  ): string {
-    const start = this.polarToCartesian(x, y, radius, endAngle);
-    const end = this.polarToCartesian(x, y, radius, startAngle);
-    const largeArcFlag = endAngle - startAngle <= 180 ? '0' : '1';
-
-    return [
-      'M',
-      x,
-      y,
-      'L',
-      start.x,
-      start.y,
-      'A',
-      radius,
-      radius,
-      0,
-      largeArcFlag,
-      0,
-      end.x,
-      end.y,
-      'Z',
-    ].join(' ');
-  }
-  // Convertit des coordonnées polaires en cartésiennes
-  private polarToCartesian(
-    centerX: number,
-    centerY: number,
-    radius: number,
-    angleInDegrees: number
-  ) {
-    const angleInRadians = ((angleInDegrees - 90) * Math.PI) / 180.0;
-    return {
-      x: centerX + radius * Math.cos(angleInRadians),
-      y: centerY + radius * Math.sin(angleInRadians),
+  // Met à jour les données du graphique
+  private updateChartData(): void {
+    this.pieChartData = {
+      labels: this.chartData.map((d) => d.country),
+      datasets: [
+        {
+          data: this.chartData.map((d) => d.totalMedals),
+          backgroundColor: this.chartData.map((d) => d.color),
+          hoverBackgroundColor: this.chartData.map((d) =>
+            this.adjustBrightness(d.color, -20)
+          ),
+          borderWidth: 0,
+        },
+      ],
     };
   }
+
+  // Fonction utilitaire pour ajuster la luminosité d'une couleur
+  private adjustBrightness(color: string, percent: number): string {
+    const num = parseInt(color.replace('#', ''), 16);
+    const amt = Math.round(2.55 * percent);
+    const R = (num >> 16) + amt;
+    const G = ((num >> 8) & 0x00ff) + amt;
+    const B = (num & 0x0000ff) + amt;
+    return `#${(
+      0x1000000 +
+      (R < 255 ? (R < 1 ? 0 : R) : 255) * 0x10000 +
+      (G < 255 ? (G < 1 ? 0 : G) : 255) * 0x100 +
+      (B < 255 ? (B < 1 ? 0 : B) : 255)
+    )
+      .toString(16)
+      .slice(1)}`;
+  }
+
+  chartHovered(event: any): void { }
+  chartClicked(event: any): void { }
+
   onSegmentClick(countryName: string): void {
     this.router.navigate(['/details', countryName]);
   }
