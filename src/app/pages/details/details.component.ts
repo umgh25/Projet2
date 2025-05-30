@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { NameCountryComponent } from "../../components/country-name/country-name.component";
-import { LineGraphComponent } from "../../components/country-trends/country-trends.component";
+import { CountryStatsComponent } from "../../components/country-name/country-name.component";
+import { CountryPerformanceChartComponent } from "../../components/country-trends/country-trends.component";
 import { OlympicCountry } from 'src/app/core/models/Olympic';
 import { ActivatedRoute } from '@angular/router';
 import { OlympicService } from 'src/app/core/services/olympic.service';
@@ -9,7 +9,7 @@ import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-details',
-    imports: [NameCountryComponent, LineGraphComponent, CommonModule],
+    imports: [CountryStatsComponent, CountryPerformanceChartComponent, CommonModule],
     template: `
   <button (click)="back()" class="btn">Back</button>
     <div class="container" *ngIf="countryData">
@@ -26,7 +26,7 @@ import { Router } from '@angular/router';
   `,
     styleUrl: './details.component.scss'
 })
-export class DetailsComponent implements OnInit {
+export class CountryDetailsComponent  implements OnInit {
   countryData?: OlympicCountry;
 
   constructor(

@@ -6,9 +6,9 @@ import { AppComponent } from './app.component';
 import { HomeComponent } from './pages/home/home.component';
 import { NotFoundComponent } from './pages/not-found/not-found.component';
 import { HeaderComponent } from './components/header/header.component';
-import { MedalsCountryComponent } from './components/country-medals/country-medals.component';
-import { GraphiqueComponent } from './components/country-medals-graph/country-medals-graph.component';
-import { NameCountryComponent } from './components/country-name/country-name.component';
+import { OlympicStatsComponent  } from './components/country-medals/country-medals.component';
+import { MedalsPieChartComponent  } from './components/country-medals-graph/country-medals-graph.component';
+import { CountryStatsComponent } from './components/country-name/country-name.component';
 
 @NgModule({
   declarations: [AppComponent, HomeComponent, NotFoundComponent],
@@ -17,9 +17,9 @@ import { NameCountryComponent } from './components/country-name/country-name.com
     AppRoutingModule,
     HttpClientModule,
     HeaderComponent,
-    MedalsCountryComponent,
-    GraphiqueComponent,
-    NameCountryComponent,
+    OlympicStatsComponent ,
+    MedalsPieChartComponent ,
+    CountryStatsComponent,
   ],
   providers: [],
   bootstrap: [AppComponent],

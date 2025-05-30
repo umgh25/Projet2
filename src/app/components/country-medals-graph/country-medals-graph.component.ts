@@ -125,7 +125,7 @@ Chart.register(
   `,
   styleUrl: './country-medals-graph.component.scss',
 })
-export class GraphiqueComponent {
+export class MedalsPieChartComponent  {
   chartData: {
     country: string;
     totalMedals: number;

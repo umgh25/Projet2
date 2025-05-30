@@ -25,7 +25,7 @@ import { OlympicCountry } from 'src/app/core/models/Olympic';
   `,
   styleUrl: './country-name.component.scss',
 })
-export class NameCountryComponent {
+export class CountryStatsComponent {
   @Input() countryData!: OlympicCountry;
 
   getTotalMedals(): number {

@@ -40,7 +40,7 @@ Chart.register(
   `,
     styleUrl: './country-trends.component.scss'
 })
-export class LineGraphComponent implements OnChanges {
+export class CountryPerformanceChartComponent implements OnChanges {
   @Input() countryData?: OlympicCountry;
 
   lineChartData: ChartConfiguration<'line'>['data'] = {
