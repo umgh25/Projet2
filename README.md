@@ -1,34 +1,46 @@
-# OlympicGamesStarter
+# 🏅 OlympicGamesStarter
 
-Une application Angular affichant des statistiques interactives sur les pays participants aux Jeux Olympiques.
+Application web développée avec Angular permettant de visualiser et analyser les statistiques des Jeux Olympiques par pays.
 
-## Fonctionnalités
+## 📋 Présentation
 
-- Visualisation des participations d’un pays aux JO
-- Graphiques interactifs (lignes, camembert)
-- Statistiques sur les médailles et les athlètes
-- Responsive (mobile et desktop)
+Cette application interactive offre une visualisation détaillée des performances olympiques à travers différents graphiques et statistiques. 
+Elle permet d'explorer l'histoire olympique de chaque pays participant.
 
-## Technologies
+## ✨ Fonctionnalités principales
 
-- Angular 17+
-- TypeScript
-- ng2-charts / Chart.js
-- SCSS
+- 📊 Visualisation interactive des données olympiques par pays
+- 📈 Graphiques dynamiques (courbes et camemberts)
+- 🏅 Suivi détaillé des médailles
+- 📱 Interface responsive (mobile et desktop)
+- 🔍 Analyse statistique des performances
 
-## Installation
+## 🛠️ Technologies utilisées
+
+- ![Angular](https://img.shields.io/badge/Angular-17+-DD0031?style=flat-square&logo=angular)
+- ![TypeScript](https://img.shields.io/badge/TypeScript-Latest-3178C6?style=flat-square&logo=typescript)
+- ![Chart.js](https://img.shields.io/badge/Chart.js-Latest-FF6384?style=flat-square&logo=chart.js)
+- ![SCSS](https://img.shields.io/badge/SCSS-Latest-CC6699?style=flat-square&logo=sass)
+
+## 🚀 Installation et démarrage
 
 ```bash
-
-# Cloner le repo
+# Cloner le projet
 git clone https://github.com/ton-utilisateur/olympic-app.git
+
+# Accéder au répertoire
 cd olympic-app
 
 # Installer les dépendances
 npm install
 
-# Lancer en local
-ng serve
-ou
+# Lancer l'application
 npm start
 ```
+
+L'application sera accessible à l'adresse `http://localhost:4200`
+
+## 📝 Prérequis
+
+- Node.js (version 16+)
+- NPM (version 8+)
