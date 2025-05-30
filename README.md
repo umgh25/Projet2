@@ -26,10 +26,10 @@ Elle permet d'explorer l'histoire olympique de chaque pays participant.
 
 ```bash
 # Cloner le projet
-git clone https://github.com/ton-utilisateur/olympic-app.git
+git clone https://github.com/ton-utilisateur/projet2.git
 
 # Accéder au répertoire
-cd olympic-app
+cd projet2
 
 # Installer les dépendances
 npm install
