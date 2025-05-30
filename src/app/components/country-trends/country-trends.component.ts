@@ -42,12 +42,12 @@ Chart.register(
 })
 export class CountryPerformanceChartComponent implements OnChanges {
   @Input() countryData?: OlympicCountry;
-
+  // Initialisation des données du graphique en ligne (labels et datasets vides)
   lineChartData: ChartConfiguration<'line'>['data'] = {
     labels: [],
     datasets: [],
   };
-
+  // Configuration des options du graphique
   lineChartOptions: ChartConfiguration<'line'>['options'] = {
     responsive: true,
     maintainAspectRatio: false, 
@@ -74,17 +74,21 @@ export class CountryPerformanceChartComponent implements OnChanges {
   lineChartType: 'line' = 'line';
 
   
-
+  // Méthode déclenchée automatiquement à chaque changement d'input (countryData)
   ngOnChanges(changes: SimpleChanges): void {
     if (this.countryData) {
+      // Extraction des années comme labels (convertis en chaîne)
       const labels = this.countryData.participations.map(p => p.year.toString());
 
+      // Extraction des données pour chaque métrique : médailles, athlètes, ratio
       const medals = this.countryData.participations.map(p => p.medalsCount);
       const athletes = this.countryData.participations.map(p => p.athleteCount);
+      // Calcul du ratio Médailles / Athlètes pour chaque participation, arrondi à 2 décimales
       const ratio = this.countryData.participations.map(p => 
         p.athleteCount ? +(p.medalsCount / p.athleteCount).toFixed(2) : 0
       );
 
+      // Mise à jour des données du graphique avec les labels et datasets
       this.lineChartData = {
         labels,
         datasets: [

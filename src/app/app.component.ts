@@ -7,7 +7,7 @@ import { OlympicService } from './core/services/olympic.service';
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.scss'],
     standalone: false
-})
+}) // AppComponent est le composant racine de l'application
 export class AppComponent implements OnInit {
   constructor(private olympicService: OlympicService) {}
 

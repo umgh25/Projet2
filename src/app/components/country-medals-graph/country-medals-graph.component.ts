@@ -9,17 +9,20 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { Chart, ArcElement, Tooltip, Legend, PieController } from 'chart.js';
 import annotationPlugin from 'chartjs-plugin-annotation';
 
-// Plugin personnalisé pour labels externes
+// Plugin personnalisé pour dessiner des labels externes au graphique
 const externalLabelsPlugin = {
   id: 'externalLabels',
+
+  // Fonction exécutée après le dessin du dataset
   afterDatasetDraw(chart: any) {
     const { ctx, chartArea, data } = chart;
-    if (!chartArea) return;
+    if (!chartArea) return; // Vérifie que la zone du graphique est bien définie
 
-    const meta = chart.getDatasetMeta(0);
-    const isMobile = window.innerWidth < 468; 
+    const meta = chart.getDatasetMeta(0); // Métadonnées du premier dataset
+    const isMobile = window.innerWidth < 468; // Détecte si on est sur mobile
 
     if (isMobile) {
+      // Version mobile : labels centrés dans chaque segment
       meta.data.forEach((arc: any, index: number) => {
         const angle = (arc.startAngle + arc.endAngle) / 2; // angle central du segment
         const label = data.labels?.[index];
@@ -28,26 +31,24 @@ const externalLabelsPlugin = {
         // Rayon pour placer le texte bien au milieu du segment
         const radius = (arc.innerRadius + arc.outerRadius) / 2;
 
-        // Calcul de la position x/y
+        // Position x et y du texte
         const x = arc.x + Math.cos(angle) * radius;
         const y = arc.y + Math.sin(angle) * radius;
 
-        // Style du texte
+        // Style du texte avec taille dynamique selon la valeur
         ctx.font = `bold ${this.getFontSize(value)}px Arial`;
         ctx.fillStyle = '#000';
-        ctx.strokeStyle = '#fff';
+        ctx.strokeStyle = '#fff'; // Contour blanc pour visibilité
         ctx.lineWidth = 2;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
 
-        // Dessin du label avec contour blanc
+        // Dessin du texte avec contour
         ctx.strokeText(label, x, y);
         ctx.fillText(label, x, y);
       });
-    }
-
-    else {
-      // Version desktop - Labels avec traits de connexion
+    } else {
+      // Version desktop : labels à l'extérieur avec ligne de liaison
       const centerX = (chartArea.left + chartArea.right) / 2;
       const centerY = (chartArea.top + chartArea.bottom) / 2;
       const outerRadius = meta.data[0]?.outerRadius ?? 0;
@@ -56,14 +57,14 @@ const externalLabelsPlugin = {
         const angle = (arc.startAngle + arc.endAngle) / 2;
         const label = data.labels?.[index];
 
-        // Points de la ligne de connexion
+        // Calcul des points pour la ligne de connexion du label
         const x1 = centerX + outerRadius * Math.cos(angle);
         const y1 = centerY + outerRadius * Math.sin(angle);
         const x2 = centerX + (outerRadius + 40) * Math.cos(angle);
         const y2 = centerY + (outerRadius + 20) * Math.sin(angle);
         const x3 = x2 + (Math.cos(angle) * 25);
 
-        // Dessin de la ligne
+        // Dessin de la ligne entre le segment et le label
         ctx.beginPath();
         ctx.moveTo(x1, y1);
         ctx.lineTo(x2, y2);
@@ -72,7 +73,7 @@ const externalLabelsPlugin = {
         ctx.lineWidth = 1.5;
         ctx.stroke();
 
-        // Texte
+        // Texte du label avec alignement selon côté gauche/droit
         ctx.font = 'bold 12px Arial';
         ctx.fillStyle = '#333';
         ctx.textAlign = angle > Math.PI ? 'right' : 'left';
@@ -80,36 +81,31 @@ const externalLabelsPlugin = {
         ctx.fillText(label, x3 + (angle > Math.PI ? -5 : 5), y2);
       });
     }
-
   },
 
-  // Fonction pour déterminer la taille de police en fonction de la valeur
+  // Calcule la taille de police en fonction de la valeur du segment
   getFontSize(value: number): number {
     const baseSize = 8;
-    const scaleFactor = Math.min(value / 1000, 1);
-    return baseSize + Math.floor(scaleFactor * 4);
+    const scaleFactor = Math.min(value / 1000, 1); // max scale à 1
+    return baseSize + Math.floor(scaleFactor * 4); // taille entre 8 et 12 px
   },
-
-
-
-
 };
 
-// Enregistrement des plugins
+// Enregistrement des plugins nécessaires pour Chart.js
 Chart.register(
   ArcElement,
   Tooltip,
   Legend,
   PieController,
   annotationPlugin,
-  externalLabelsPlugin,
+  externalLabelsPlugin, // notre plugin personnalisé
   ChartDataLabels
 );
 
 @Component({
   selector: 'app-graphique',
   standalone: true,
-  imports: [CommonModule, BaseChartDirective],
+  imports: [CommonModule, BaseChartDirective], // Import du module commun et directive graphique
   template: `
     <div class="pie-chart-container">
       <canvas
@@ -125,26 +121,29 @@ Chart.register(
   `,
   styleUrl: './country-medals-graph.component.scss',
 })
-export class MedalsPieChartComponent  {
+export class MedalsPieChartComponent {
+  // Données transformées pour le graphique
   chartData: {
     country: string;
     totalMedals: number;
     color: string;
     percentage: number;
   }[] = [];
-  totalMedals = 0;
-  colorScheme = ['#8C3F4D', '#9D5D5D', '#AEC4E8', '#C2E3F5', '#9986A5'];
 
-  public pieChartType: ChartType = 'pie';
+  totalMedals = 0; // Total des médailles de tous les pays
+  colorScheme = ['#8C3F4D', '#9D5D5D', '#AEC4E8', '#C2E3F5', '#9986A5']; // Palette de couleurs
 
-  // Structure des données pour ng2-charts
+  public pieChartType: ChartType = 'pie'; // Type de graphique : camembert
+
+  // Configuration initiale des données pour ng2-charts
   public pieChartData: ChartConfiguration['data'] = {
-    labels: [], // Noms des pays 
+    labels: [], // noms des pays
     datasets: [{ data: [], backgroundColor: [], hoverBackgroundColor: [] }],
   };
 
+  // Options de configuration du graphique
   public pieChartOptions: ChartConfiguration['options'] = {
-    maintainAspectRatio: false,
+    maintainAspectRatio: false, // ne pas forcer le ratio fixe
     layout: {
       padding: {
         top: 30,
@@ -155,14 +154,15 @@ export class MedalsPieChartComponent  {
     },
     plugins: {
       legend: {
-        display: false,
+        display: false, // pas de légende automatique
       },
       datalabels: {
-        display: false,
+        display: false, // labels internes désactivés, on utilise le plugin personnalisé
       },
       tooltip: {
         enabled: true,
         callbacks: {
+          // Format personnalisé pour les tooltips (affiche une médaille et la valeur)
           label: (context) => {
             const value = context.raw as number;
             const medalIcon = '🏅';
@@ -176,11 +176,11 @@ export class MedalsPieChartComponent  {
         borderWidth: 1,
         cornerRadius: 8,
         padding: 10,
-        displayColors: false,
+        displayColors: false, // pas de carré de couleur dans tooltip
       },
-
     },
 
+    // Gestion du clic sur un segment du camembert
     onClick: (_event, elements) => {
       if (elements.length > 0) {
         const index = elements[0].index;
@@ -189,13 +189,14 @@ export class MedalsPieChartComponent  {
     },
   };
 
-  constructor(private olympicService: OlympicService, private router: Router) { }
+  constructor(private olympicService: OlympicService, private router: Router) {}
 
   ngOnInit(): void {
+    // Récupération des données via le service OlympicService
     this.olympicService.getOlympics().subscribe({
       next: (data) => {
         if (data) {
-          // Calcul du total des médailles
+          // Calcul du total général des médailles pour tous les pays
           this.totalMedals = data.reduce(
             (sum, country) =>
               sum +
@@ -203,7 +204,7 @@ export class MedalsPieChartComponent  {
             0
           );
 
-          // Transformation des données pour le graphique
+          // Préparation des données pour le graphique
           this.chartData = data
             .map((country, index) => ({
               country: country.country,
@@ -212,18 +213,18 @@ export class MedalsPieChartComponent  {
                 0
               ),
               color: this.colorScheme[index % this.colorScheme.length],
-              percentage: 0,
+              percentage: 0, // non utilisé ici mais prêt pour un usage futur
             }))
-            .sort((a, b) => b.totalMedals - a.totalMedals); // Tri décroissant
+            .sort((a, b) => b.totalMedals - a.totalMedals); // Tri décroissant selon total médailles
 
-          this.updateChartData();
+          this.updateChartData(); // Mise à jour des données du graphique
         }
       },
       error: (err) => console.error('Error loading data:', err),
     });
   }
 
-  // Met à jour les données du graphique
+  // Met à jour la structure des données pour Chart.js (labels, data, couleurs)
   private updateChartData(): void {
     this.pieChartData = {
       labels: this.chartData.map((d) => d.country),
@@ -232,7 +233,7 @@ export class MedalsPieChartComponent  {
           data: this.chartData.map((d) => d.totalMedals),
           backgroundColor: this.chartData.map((d) => d.color),
           hoverBackgroundColor: this.chartData.map((d) =>
-            this.adjustBrightness(d.color, -20)
+            this.adjustBrightness(d.color, -20) // Couleur légèrement plus sombre au survol
           ),
           borderWidth: 0,
         },
@@ -240,7 +241,7 @@ export class MedalsPieChartComponent  {
     };
   }
 
-  // Fonction utilitaire pour ajuster la luminosité d'une couleur
+  // Ajuste la luminosité d'une couleur hex (positive ou négative)
   private adjustBrightness(color: string, percent: number): string {
     const num = parseInt(color.replace('#', ''), 16);
     const amt = Math.round(2.55 * percent);
@@ -257,9 +258,11 @@ export class MedalsPieChartComponent  {
       .slice(1)}`;
   }
 
-  chartHovered(event: any): void { }
-  chartClicked(event: any): void { }
+  // Méthodes pour gérer les événements hover et click (actuellement vides)
+  chartHovered(event: any): void {}
+  chartClicked(event: any): void {}
 
+  // Action au clic sur un segment : navigation vers une page détail du pays
   onSegmentClick(countryName: string): void {
     this.router.navigate(['/details', countryName]);
   }

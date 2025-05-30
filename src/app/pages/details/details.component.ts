@@ -30,13 +30,15 @@ export class CountryDetailsComponent  implements OnInit {
   countryData?: OlympicCountry;
 
   constructor(
+    // Importation des modules nécessaires
     private route: ActivatedRoute,
     private olympicService: OlympicService,
     private router: Router
   ) { }
   back() {
     this.router.navigate(['']);  
-  }
+  } 
+  // Méthode ngOnInit pour initialiser le composant
   ngOnInit(): void {
     this.route.paramMap.subscribe((params) => {
       const countryName = params.get('country');
